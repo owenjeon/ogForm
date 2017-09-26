@@ -16,6 +16,7 @@ window.Selector = class {
 		});
 	}
 
+	
 	getInputType(el){
 		if(el.tagName === 'textarea' || /(text|email|number|tel)/.test(el.type)) return (new textValidator(el));
 		const childInput = el.querySelector('input');
