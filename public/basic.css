@@ -1,0 +1,21 @@
+div{
+	margin:5px 0;
+}
+input[type=text], textarea{
+	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+	width:100%;padding:5px; font-size: 14px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+	border:1px solid #C6C6C6;margin:0;outline: none;
+}
+
+textarea{
+	resize:none;
+}
+
+input[type=text].og-valid{ border-color: #13c63b;}
+input[type=text].og-dirty.og-invalid{ border-color: #c63b2b;}
+
+textarea.og-valid{ border-color: #13c63b;}
+textarea.og-dirty.og-invalid{ border-color: #c63b2b;}
+
+.og-valid input[type=checkbox] + span{ color: #13c63b; }
+.og-invalid input[type=checkbox] + span{ color: #c63b2b;}
