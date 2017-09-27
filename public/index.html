@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="basic.css">
 </head>
 <body>
-<form>
+<form name="frm">
   <div>
     <input type="text" class="og-control" minlength="0" maxlength="3" pattern="\d{2,3}" required>
   </div>
@@ -28,7 +28,10 @@
 
 <script src="dist/ogForm.js"></script>
 <script>
-  const og = new Selector('.og-control');
+  const og = new Selector({
+    form: document.frm,
+    inputClass: '.og-control'
+  });
 </script>
 
 

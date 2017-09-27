@@ -1,3 +1,10 @@
+
+form{
+	display: block; padding: 10px;
+}
+form.og-valid{
+	background-color: #94ff9f;
+}
 div{
 	margin:5px 0;
 }
@@ -17,5 +24,5 @@ input[type=text].og-dirty.og-invalid{ border-color: #c63b2b;}
 textarea.og-valid{ border-color: #13c63b;}
 textarea.og-dirty.og-invalid{ border-color: #c63b2b;}
 
-.og-valid input[type=checkbox] + span{ color: #13c63b; }
-.og-invalid input[type=checkbox] + span{ color: #c63b2b;}
+.og-control.og-valid input[type=checkbox] + span{ color: #13c63b; }
+.og-control.og-invalid input[type=checkbox] + span{ color: #c63b2b;}

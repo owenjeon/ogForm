@@ -2,10 +2,17 @@ import 'classlist';
 
 window.Selector = class {
 	constructor(eleStr){
-		this._eles = document.querySelectorAll(eleStr);
 		this._list = new Set();
+		this._container = undefined;
+		this._init(eleStr);
+	}
+
+	_init({form, inputClass}){
+		this._eles = document.querySelectorAll(inputClass);
+		this.formEle = form && (new ContainerValidator({el:form, list: this._list}));
 		this.setValidator();
 	}
+
 	setValidator(){
 		this._eles.forEach(el => {
 			if(!el.ogInput){ //validator 가 등록된 input
@@ -16,11 +23,14 @@ window.Selector = class {
 		});
 	}
 
-	
 	getInputType(el){
-		if(el.tagName === 'textarea' || /(text|email|number|tel)/.test(el.type)) return (new textValidator(el));
+		if(el.tagName === 'textarea' || /(text|email|number|tel)/.test(el.type)) return (new TextValidator(el, this.formEle));
 		const childInput = el.querySelector('input');
-		if(childInput && (childInput.type === "checkbox")) return (new checkValidator(el));
+		if(childInput && (childInput.type === "checkbox")) return (new CheckboxValidator(el, this.formEle));
+	}
+
+	isValidateAll(){
+		return [...this._list.values()].every((v) => v.state.isValid);
 	}
 };
 
@@ -31,10 +41,13 @@ class Validator{
 		})
 	}
 
-	constructor(el){
+	constructor(el, container){
 		this._el = el;
 		this._state = {isTouched : false, isPristine : true, isValid : false};
 		this.stateReady = false;
+
+		this._listeners = new Set();
+		container && this.addListener(container);
 	}
 	get state(){
 		return this._state;
@@ -48,6 +61,7 @@ class Validator{
 		setTimeout(()=>{
 			if(this.stateReady){
 				this.render();
+				this._notify();
 				this.stateReady = false;
 			}
 		},0);
@@ -60,12 +74,44 @@ class Validator{
 	_render(){
 		throw 'must be override';
 	}
+
+	addListener(s){
+		this._listeners.add(s);
+	}
+	removeListener(){
+		this._listeners.remove(s);
+	}
+	_notify(){
+		this._listeners.forEach(v => {
+			v.listen();
+		})
+	}
 }
 
-class textValidator extends Validator{
-
-	constructor(el){
+class ContainerValidator extends Validator{
+	constructor({el, list}){
 		super(el);
+		this._list = list;
+	}
+
+	isValidateAll(){
+		return [...this._list.values()].every((v) => v.state.isValid);
+	}
+	listen(){
+		this.onChecking();
+	}
+
+	onChecking(){
+		this.setState({isValid: this.isValidateAll()})
+	}
+	_render(){
+	}
+}
+
+class TextValidator extends Validator{
+
+	constructor(el, formEle){
+		super(el, formEle);
 		this._pattern = this._el.getAttribute('pattern') ? new RegExp(this._el.getAttribute('pattern')) : null;
 		this.onChecking();
 	}
@@ -104,18 +150,15 @@ class textValidator extends Validator{
 			checkValidate(val);
 		});
 
-		this._el.addEventListener('focus', e => {
-			this.setState({isTouched: true});
-		});
 		this._el.addEventListener('blur', e => {
-			this.setState({isTouched: false});
+			!this.state.isTouched && this.setState({isTouched: true});
 		});
 	}
 }
 
-class checkValidator extends Validator{
-	constructor(el){
-		super(el);
+class CheckboxValidator extends Validator{
+	constructor(el, formEle){
+		super(el, formEle);
 		this._inputs = el.querySelectorAll('input');
 		this.onChecking();
 	}
