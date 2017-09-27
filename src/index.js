@@ -1,5 +1,4 @@
 import 'classlist';
-
 window.Selector = class {
 	constructor(eleStr){
 		this._list = new Set();

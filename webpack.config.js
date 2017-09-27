@@ -9,11 +9,12 @@ module.exports = {
 		"filename": "[name].js"
 	},
 	devServer: {
-		contentBase: './public/',
-		watchContentBase: true,
-		compress: true,
-		port: 9000,
-		hot: true
+		inline: true,
+		contentBase: __dirname + '/public/',
+		publicPath: '/',
+		// watchContentBase: true,
+		// compress: true,
+		port: 9000
 	},
 	module: {
 		rules: [
