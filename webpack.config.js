@@ -5,7 +5,7 @@ module.exports = {
 		ogForm:['./src/index'],
 	},
 	output: {
-		path: __dirname + '/public/dist/',
+		path: __dirname + '/public/',
 		"filename": "[name].js"
 	},
 	devServer: {
