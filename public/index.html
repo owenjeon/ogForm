@@ -34,9 +34,9 @@
 
 <script src="ogForm.js"></script>
 <script>
-  const og = new Selector({
+  const og = new OgForm({
     form: document.frm,
-    inputClass: '.og-control'
+	  inputs: [document.querySelectorAll('.og-control')]
   });
 </script>
 

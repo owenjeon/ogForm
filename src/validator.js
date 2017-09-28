@@ -12,6 +12,7 @@ class Validator{
 		this.stateReady = false;
 
 		this._listeners = new Set();
+		this._evListeners = [];
 		container && this.addListener(container);
 	}
 	get state(){
@@ -32,12 +33,24 @@ class Validator{
 		},0);
 	}
 
+	addEvList(target, ev, listener){
+		target.addEventListener(ev, listener);
+		this._evListeners.push({target, ev, listener});
+		return target;
+	}
+
+	removeEvList(){
+		this._evListeners.forEach(({target, ev, listener}) => target.removeEventListener(ev, listener))
+	}
+
+	destroy(){
+		this._el.classList.remove('og-valid', 'og-invalid', 'og-touched', 'og-untouched', 'og-pristine', 'og-dirty');
+		this.removeEvList();
+	}
+
 	render(){
 		this.toggleClass(this._state.isValid, 'og-valid', 'og-invalid');
 		this._render();
-	}
-	_render(){
-		throw 'must be override';
 	}
 	addListener(s){
 		this._listeners.add(s);
@@ -47,6 +60,9 @@ class Validator{
 	}
 	_notify(){
 		this._listeners.forEach(v => v.listen())
+	}
+	_render(){
+		throw 'must be override';
 	}
 }
 
@@ -100,19 +116,16 @@ export class TextValidator extends Validator{
 		this.toggleClass(this.state.isTouched, 'og-touched', 'og-untouched');
 		this.toggleClass(this.state.isPristine, 'og-pristine', 'og-dirty');
 	}
+
 	onChecking(){
-		const checkValidate = val => {
-			const valid = this.validateMaxLen(val) && this.validateMinLen(val) && this.validatePattern(val) && this.validateRequire(val);
-			valid !== this.state.isValid && this.setState({isValid: valid});
-		};
-		this._el.addEventListener('input', e => {
+		this.addEvList(this._el, 'input', e => {
 			this.state.isPristine && this.setState({isPristine: false});
 			const val = e.target.value;
-			checkValidate(val);
-		});
-
-		this._el.addEventListener('blur', e => {
-			!this.state.isTouched && this.setState({isTouched: true});
+			const valid = this.validateMaxLen(val) && this.validateMinLen(val) && this.validatePattern(val) && this.validateRequire(val);
+			valid !== this.state.isValid && this.setState({isValid: valid});
+		})
+		this.addEvList(this._el, 'blur', e => {
+			!this.state.isTouched && this.setState({isTouched: true})
 		});
 	}
 }
@@ -138,7 +151,7 @@ export class CheckboxValidator extends Validator{
 
 	onChecking(){
 		this._inputs.forEach(ipt => {
-			ipt.addEventListener('click', () => {
+			this.addEvList(ipt, 'click', () => {
 				this.state.isPristine && this.setState({isPristine: false});
 				const cnt = [...this._inputs].filter(v=>v.checked).length;
 				const valid = this.validateMaxCheck(cnt) && this.validateMinCheck(cnt);
@@ -163,13 +176,13 @@ export class SelectValidator extends Validator{
 	}
 
 	onChecking(){
-		this._el.addEventListener('change', e => {
+		this.addEvList(this._el, 'change', e => {
 			this.state.isPristine && this.setState({isPristine: false});
 			const val = e.target.value;
 			const valid = this.validateRequire(val);
 			valid !== this.state.isValid && this.setState({isValid: valid});
 		});
-		this._el.addEventListener('blur', e => {
+		this.addEvList(this._el, 'blur', e => {
 			!this.state.isTouched && this.setState({isTouched: true});
 		});
 	}
