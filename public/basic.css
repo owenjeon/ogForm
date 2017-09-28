@@ -13,6 +13,13 @@ input[type=text], textarea{
 	width:100%;padding:5px; font-size: 14px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 	border:1px solid #C6C6C6;margin:0;outline: none;
 }
+select{
+	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+	width:100%;padding:5px; font-size: 14px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+	border:1px solid #C6C6C6;margin:0;outline: none;height:30px; background-color: #fff;
+}
+select.og-control.og-valid{ border-color: #13c63b; }
+select.og-control.og-invalid{ border-color: #c63b2b;}
 
 textarea{
 	resize:none;

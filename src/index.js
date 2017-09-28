@@ -1,4 +1,6 @@
 import 'classlist';
+import {ContainerValidator,TextValidator,CheckboxValidator, SelectValidator} from './validator';
+
 window.Selector = class {
 	constructor(eleStr){
 		this._list = new Set();
@@ -23,8 +25,9 @@ window.Selector = class {
 	}
 
 	getInputType(el){
-		if(el.tagName === 'textarea' || /(text|email|number|tel)/.test(el.type)) return (new TextValidator(el, this.formEle));
-		const childInput = el.querySelector('input');
+		if(el.tagName === 'TEXTAREA' || /(text|email|number|tel)/.test(el.type)) return (new TextValidator(el, this.formEle));
+		if(el.tagName === 'SELECT') return (new SelectValidator(el, this.formEle));
+		const childInput = el.querySelector('INPUT');
 		if(childInput && (childInput.type === "checkbox")) return (new CheckboxValidator(el, this.formEle));
 	}
 
@@ -84,107 +87,5 @@ class Validator{
 		this._listeners.forEach(v => {
 			v.listen();
 		})
-	}
-}
-
-class ContainerValidator extends Validator{
-	constructor({el, list}){
-		super(el);
-		this._list = list;
-	}
-
-	isValidateAll(){
-		return [...this._list.values()].every((v) => v.state.isValid);
-	}
-	listen(){
-		this.onChecking();
-	}
-
-	onChecking(){
-		this.setState({isValid: this.isValidateAll()})
-	}
-	_render(){
-	}
-}
-
-class TextValidator extends Validator{
-
-	constructor(el, formEle){
-		super(el, formEle);
-		this._pattern = this._el.getAttribute('pattern') ? new RegExp(this._el.getAttribute('pattern')) : null;
-		this.onChecking();
-	}
-
-	validateMaxLen(val){
-		if(this._el.maxLength === -1) return true;
-		return this._el.maxLength >= val.length;
-	}
-
-	validateMinLen(val){
-		if(this._el.minLength === -1) return true;
-		return this._el.minLength <= val.length;
-	}
-
-	validatePattern(val){
-		if(this._pattern === null) return true;
-		return this._pattern.test(val);
-	}
-
-	validateRequire(val){
-		if(!this._el.required) return true;
-		return val !== "";
-	}
-	_render(){
-		this.toggleClass(this.state.isTouched, 'og-touched', 'og-untouched');
-		this.toggleClass(this.state.isPristine, 'og-pristine', 'og-dirty');
-	}
-	onChecking(){
-		const checkValidate = val => {
-			const valid = this.validateMaxLen(val) && this.validateMinLen(val) && this.validatePattern(val) && this.validateRequire(val);
-			valid !== this.state.isValid && this.setState({isValid: valid});
-		};
-		this._el.addEventListener('input', e => {
-			this.state.isPristine && this.setState({isPristine: false});
-			const val = e.target.value;
-			checkValidate(val);
-		});
-
-		this._el.addEventListener('blur', e => {
-			!this.state.isTouched && this.setState({isTouched: true});
-		});
-	}
-}
-
-class CheckboxValidator extends Validator{
-	constructor(el, formEle){
-		super(el, formEle);
-		this._inputs = el.querySelectorAll('input');
-		this.onChecking();
-	}
-
-	validateMaxCheck(cnt){
-		const max = this._el.getAttribute('maxCheck');
-		if(max === null) return true;
-		return max >= cnt;
-	}
-
-	validateMinCheck(cnt){
-		const min = this._el.getAttribute('minCheck');
-		if(min === null) return true;
-		return min <= cnt;
-	}
-
-	onChecking(){
-		this._inputs.forEach(ipt => {
-			ipt.addEventListener('click', () => {
-				this.state.isPristine && this.setState({isPristine: false});
-				const cnt = [...this._inputs].filter(v=>v.checked).length;
-				const valid = this.validateMaxCheck(cnt) && this.validateMinCheck(cnt);
-				valid !== this.state.isValid && this.setState({isValid: valid})
-			});
-		});
-	}
-	_render(){
-		this.toggleClass(this.state.isPristine, 'og-pristine', 'og-dirty');
 	}
 }
