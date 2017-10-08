@@ -14,6 +14,7 @@ const og = new OgForm({
 * `form?: HTMLElement` validation을 할 요소들이 들어있는 form 엘리먼트를 의미합니다. 없는 경우 전체 form요소에 대한 validatiaon은 하지 않습니다.
 * `inputs: HTMLElement | NodeList | string| Array< HTMLElement | NodeList | string>` 필수옵션입니다.
     * `string`의 경우 내부적으로 `querySelectAll`을 하여 엘리먼트를 찾습니다.
+* `checkWhenSubmit?: Boolean`form과 각 요소들에 대한 validation을, 값이 변경될때마다 할지, submit시에만 할 지 선택하는 옵션입니다. `false`일 경우 값이 변경될때마다 체크합니다. default는 `false`.
 
 
 #### Validation하는 요소들.

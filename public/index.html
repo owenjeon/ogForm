@@ -28,6 +28,7 @@
     <label><input type="checkbox" name="chk1"><span>옵션3</span></label>
     <label><input type="checkbox" name="chk1"><span>옵션4</span></label>
   </div>
+  <button type="submit">제출하기</button>
 </form>
 
 
@@ -36,7 +37,8 @@
 <script>
   const og = new OgForm({
     form: document.frm,
-	  inputs: [document.querySelectorAll('.og-control')]
+	  inputs: [document.querySelectorAll('.og-control')],
+    checkWhenSubmit: false
   });
 </script>
 

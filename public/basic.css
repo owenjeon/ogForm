@@ -26,10 +26,10 @@ textarea{
 }
 
 input[type=text].og-valid{ border-color: #13c63b;}
-input[type=text].og-dirty.og-invalid{ border-color: #c63b2b;}
+input[type=text].og-invalid{ border-color: #c63b2b;}
 
 textarea.og-valid{ border-color: #13c63b;}
-textarea.og-dirty.og-invalid{ border-color: #c63b2b;}
+textarea.og-invalid{ border-color: #c63b2b;}
 
 .og-control.og-valid input[type=checkbox] + span{ color: #13c63b; }
 .og-control.og-invalid input[type=checkbox] + span{ color: #c63b2b;}
