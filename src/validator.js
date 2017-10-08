@@ -1,6 +1,26 @@
 'use strict';
 
+const dataSet = (() => {
+	const div = document.createElement('DIV');
+	const camelToDash = ( myStr ) => myStr.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();
+	return ('dataset' in div) ?
+		(el, k, v) => (v === undefined ? el.dataset[k] : (el.dataset[k] = v)) :
+		(el, k, v) => (v === undefined ? el.getAttribute('data-'+camelToDash(k)) : el.setAttribute('data-'+camelToDash(k), v));
+})();
+
+const cloneObj = (obj) => {
+	const o = {};
+	for (let k in obj) if(obj.hasOwnProperty(k)) o[k] = obj[k];
+	return o
+};
+
 export class Validator{
+	static takeStates(obj){
+		const o = {};
+		for (let k in obj) o[k] = (typeof obj[k] === 'function') ? obj[k]() : obj[k];
+		return o;
+	}
+
 	toggleClass(flag, trueCls, falseCls){
 		[flag, !flag].forEach((b, i) => {
 			this._el.classList[b ? 'add' : 'remove'](i ? falseCls : trueCls);
@@ -10,13 +30,13 @@ export class Validator{
 
 	constructor(el, container){
 		this._el = el;
-		this._state = {isTouched : false, isPristine : true, isValid : false};
-		this._prevState = Object.assign(this._state);
+		this._state = {isTouched : false, isPristine : true, isValid : undefined};
+		this._prevState = cloneObj(this._state);
 		this._tempState = {};
 		this.stateReady = false;
-
 		this._listeners = new Set();
 		this._evListeners = [];
+		this._helper = new HelpBox(this);
 		container && this.addListener(container);
 	}
 	get state(){
@@ -30,20 +50,14 @@ export class Validator{
 		}
 		setTimeout(()=>{
 			if(this.stateReady){
-				this._state = Object.assign(this._state, this._takeStates(this._tempState));
+				this._state = Object.assign({}, this._state, Validator.takeStates(this._tempState));
 				this.render();
 				this._notify();
-				this._prevState = Object.assign(this._state);
+				this._prevState = cloneObj(this._state);
 				this._tempState = {};
 				this.stateReady = false;
 			}
 		},0);
-	}
-
-	_takeStates(obj){
-		const o = {};
-		for (let k in obj) o[k] = (typeof obj[k] === 'function') ? obj[k]() : obj[k];
-		return o;
 	}
 
 	addEvList(target, ev, listener){
@@ -62,7 +76,11 @@ export class Validator{
 	}
 
 	render(){
-		"isValid" in this._tempState && this.toggleClass(this._state.isValid, 'og-valid', 'og-invalid');
+		if("isValid" in this._tempState && this._prevState.isValid !== this._state.isValid){
+			this.toggleClass(this._state.isValid, 'og-valid', 'og-invalid');
+			const text = this._state.isValid ? dataSet(this._el, 'ogValid') : dataSet(this._el, 'ogInvalid');
+			this._helper[text ? 'appendText' : 'removeEle'](text);
+		}
 		this._render();
 	}
 	addListener(s){
@@ -79,6 +97,24 @@ export class Validator{
 	}
 	validate(){
 		throw 'must be override';
+	}
+}
+
+class HelpBox {
+	constructor(validator){
+		this._el = validator._el;
+		this.createHelpBox();
+	}
+	createHelpBox(){
+		this._helpEl = document.createElement('div');
+		this._helpEl.classList.add('helper');
+	}
+	appendText(text){
+		this._helpEl.innerHTML = text;
+		this._helpEl.parentNode || this._el.parentNode.appendChild(this._helpEl);
+	}
+	removeEle(){
+		this._helpEl.parentNode && this._el.parentNode.removeChild(this._helpEl);
 	}
 }
 
@@ -117,7 +153,8 @@ export class ContainerValidator extends Validator{
 	validateAll(){
 		[...this._list.values()].forEach(o => o.validate());
 	}
-	_render(){}
+	_render(){
+	}
 }
 
 export class TextValidator extends Validator{

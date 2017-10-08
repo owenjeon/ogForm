@@ -11,7 +11,10 @@
 <body>
 <form name="frm">
   <div>
-    <input type="text" class="og-control" minlength="0" maxlength="3" pattern="\d{2,3}" required>
+    <input type="text" class="og-control" minlength="0" maxlength="3" pattern="\d{2,3}" required data-og-invalid="숫자로 이루어진 2자 이상을 입력하세요" data-og-valid="올바른 값을 입력하셨습니다.">
+  </div>
+  <div>
+    <input type="text" class="og-control" minlength="0" maxlength="10" pattern="\D{3,8}" required data-og-invalid="숫자 이외의 글자 3자 이상을 연속해서 입력하세요." >
   </div>
   <div>
     <textarea class="og-control" name="" id="" cols="30" rows="10" minlength="10"></textarea>
